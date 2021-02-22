@@ -11,7 +11,7 @@ const app = express()
 app.use(bodyParser.json())
 app.use(cors())
 
-const port = 3000
+const port = process.env.PORT || 3000
 
 app.post('/totals/:metric', (req, res) => {
     let reg = req.body
@@ -57,6 +57,7 @@ app.post('/correctness', (req, res) => {
 
 app.listen(port, async () => {
     testData = await readDataCSV(__dirname+'\\'+'testData.csv')
+    console.log(`Server listening on port:${port}`)
 })
 
 const summaryCalcs = {
