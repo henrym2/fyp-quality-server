@@ -2,10 +2,12 @@ const express = require("express")
 const bodyParser = require("body-parser")
 const cors = require("cors")
 const objUtils = require("./js/objUtils.js")
-const { readDataCSV } = require("./js/dataRead")
+const dataReader = require("./js/dataRead.js")
+const { summaryCalcs } = require("./js/dataManipulation.js")
+const uploader = require("./js/multer.js")
+const { readDataCSV } = require("./js/dataRead.js")
 
 let testData = {}
-
 
 const app = express()
 app.use(bodyParser.json())
@@ -22,7 +24,7 @@ app.post('/totals/:metric', (req, res) => {
     if (reg == []) {
         res.json({})
     }
-    res.json(summaryCalcs[metric](reg))
+    res.json(summaryCalcs[metric](reg, testData))
 })
 
 app.get('/registries', (_, res) => {
@@ -31,56 +33,67 @@ app.get('/registries', (_, res) => {
 
 app.post('/totals', (req, res) => {
     let reg = req.body.registries
-    res.json(objUtils.getMetricValues("", reg, testData))
+    let set = req.body.set
+    let data = readDataCSV(__dirname+'\\data\\'+set.path)
+
+    res.json(objUtils.getMetricValues("", reg, data))
 })
 
 app.post('/completeness', (req, res) => {
-    let reg = req.body
-    res.json(objUtils.getMetricValues("complete", reg, testData))
+    let reg = req.body.registries
+    let set = req.body.set
+    let data = readDataCSV(__dirname+'\\data\\'+set.path)
+
+    res.json(objUtils.getMetricValues("complete", reg, data))
 })
 
 app.post('/uniqueness', (req, res) => {
-    let reg = req.body
-    res.json(objUtils.getMetricValues("unique", reg, testData))
+    let reg = req.body.registries
+    let set = req.body.set
+    let data = readDataCSV(__dirname+'\\data\\'+set.path)
+
+    res.json(objUtils.getMetricValues("unique", reg, data))
 })
 
 app.post('/consistency', (req, res) => {
-    let reg = req.body
-    res.json(objUtils.getMetricValues("consist", reg, testData))
+    let reg = req.body.registries
+    let set = req.body.set
+    let data = readDataCSV(__dirname+'\\data\\'+set.path)
+
+    res.json(objUtils.getMetricValues("consist", reg, data))
 })
 
 app.post('/correctness', (req, res) => {
-    let reg = req.body
-    res.json(objUtils.getMetricValues("correct", reg, testData))
+    let reg = req.body.registries
+    let set = req.body.set
+    let data = readDataCSV(__dirname+'\\data\\'+set.path)
+
+    res.json(objUtils.getMetricValues("correct", reg, data))
 })
 
+app.post('/uploadCSV', uploader.single('file'), (_, res) => {
+    let csvs = dataReader.getCSVList()
+    testData = readDataCSV(__dirname+'\\data\\'+csvs[0].path)
+    res.send()
+})
 
-app.listen(port, async () => {
-    testData = await readDataCSV(__dirname+'\\'+'testData.csv')
+app.get('/csvList', (_, res) => {
+    let csvs = dataReader.getCSVList()
+    res.json(csvs)
+})
+
+app.post('/timeData', (req, res) => {
+    let reg = req.body.registries
+    let metric = req.body.metric
+    res.json(dataReader.averagesOverTime(reg, metric))
+})
+
+app.get('/getUploadedCSVList', (_, res) => {
+    res.json(getCSVList())
+})
+
+app.listen(port, () => {
+    let csvs = dataReader.getCSVList()
+    testData = readDataCSV(__dirname+'\\data\\'+csvs[0].path)
     console.log(`Server listening on port:${port}`)
 })
-
-const summaryCalcs = {
-    "unique": (reg) => {
-        let metrics = objUtils.getMetricValues("unique", reg, testData)
-        return Object.keys(metrics).reduce((acc, cur) => {
-            acc[cur] = 100 - parseInt(metrics[cur]['unique_ids_perc'])
-            return acc
-        }, {})
-    },
-    "complete": (reg) => {
-        let metrics = objUtils.getMetricValues("complete", reg, testData)
-        return Object.keys(metrics).reduce((acc, cur) => {
-            acc[cur] = parseInt(metrics[cur]['complete_all'])
-            return acc
-        }, {})
-    },
-    "consistency": (reg) => {
-        let metrics = objUtils.getMetricValues("consist", reg, testData)
-        return objUtils.objAverage(metrics)
-    },
-    "correct": (reg) => {
-        let metrics = objUtils.getMetricValues("correct", reg, testData)
-        return objUtils.objAverage(metrics)
-    }
-}
