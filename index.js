@@ -16,7 +16,13 @@ app.use(cors())
 const port = process.env.PORT || 3000
 
 app.post('/totals/:metric', (req, res) => {
-    let reg = req.body
+    let reg = req.body.registries
+    let set = req.body.set
+    
+    if (set.path === undefined) {
+        set = dataReader.getCSVList()[0]
+    }
+    let data = readDataCSV(__dirname+'\\data\\'+set.path)
     let metric = req.params.metric
     if (reg == undefined) {
         res.sendStatus(402)
@@ -24,7 +30,7 @@ app.post('/totals/:metric', (req, res) => {
     if (reg == []) {
         res.json({})
     }
-    res.json(summaryCalcs[metric](reg, testData))
+    res.json(summaryCalcs[metric](reg, data))
 })
 
 app.get('/registries', (_, res) => {
