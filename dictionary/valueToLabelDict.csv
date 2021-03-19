@@ -1,0 +1,39 @@
+variable_name,variable_label
+unique_ids_total,Total IDs including unique and duplicates 
+unique_visits_total,Total visits / encounters including unique and duplicates
+unique_ids_dup,Number of duplicate patient IDs
+unique_visits_dup,Number of duplicate patient visits / encounters
+unique_ids_perc,1 - unique_ids_dup / unique_ids_total as percentage
+uniquw_visits_perc,1 - unique_visits_dup / unique_visits_total as percentage
+unique_sep_id,Number of patients entered more than once with a separate unique patient ID
+consist_type_gender,Percentage of gender variable in correct data type
+consist_type_dob,Percentage of DOB variable in correct data type
+consist_type_ancaspec,Percentage of ANCA specificity variable in correct data type
+consist_type_comorb,Percentage of a specific comorbidity variable in correct data type (check 'diabetes' if present)
+consist_type_bvas,Percentage of BVAS variable (or 'organ involvement' if BVAS not in your registry) in correct data type
+consist_type_creat,Percentage of Creatinine variable in correct data type
+consist_type_dodeath,Percentage of Date of Death variable in correct data type
+consist_type_doeskd,Percentage of Date of End Stage Kidney Disease variable in correct data type
+consist_logic_deathbirth,Percentage where Date of Death > Date of Birth = TRUE
+consist_logic_deathdiag,Percentage where Date of Death > Date of Diagnosis = TRUE
+consist_logic_bvas,Percentage where BVAS between 0-63 = TRUE
+consist_logic_egfr,Percentage where eGFR between 0-200 = TRUE
+complete_all,Percentage of complete data across whole data set
+complete_gender,Percentage of complete data in specific variable
+complete_dob,Percentage of complete data in specific variable
+complete_ancaspec,Percentage of complete data in specific variable
+complete_comorb,Percentage of complete data in specific variable
+complete_bvas,Percentage of complete data in specific variable
+complete_creat,Percentage of complete data in specific variable
+complete_dodeath_raw,Percentage of complete Date of Death data regardless if deceased or not
+complete_doeskd_raw,Percentage of complete Date of ESKD data regardless if ESKD or not
+complete_dodeath_adj,Percentage of complete Date of Death data if patient deceased
+complete_doeskd_adj,Percentage of complete Date of Death data if patient ESKD
+correct_gender,Percentage of 10 patients correct when checked against 'gold standard'
+correct_dob,Percentage of 10 patients correct when checked against 'gold standard'
+correct_ancaspec,Percentage of 10 patients correct when checked against 'gold standard'
+correct_comorb,Percentage of 10 patients correct when checked against 'gold standard'
+correct_bvas,Percentage of 10 patients correct when checked against 'gold standard'
+correct_creat,Percentage of 10 patients correct when checked against 'gold standard'
+correct_dodeath,Percentage of 10 patients correct when checked against 'gold standard'
+correct_doeskd,Percentage of 10 patients correct when checked against 'gold standard'

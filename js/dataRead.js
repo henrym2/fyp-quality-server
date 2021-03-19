@@ -3,6 +3,14 @@ const fs = require("fs")
 const { summaryCalcs } = require("./dataManipulation.js")
 
 module.exports = {
+    generateReadableLabels() {
+        const fileContent = fs.readFileSync(__dirname+'\\..\\dictionary\\valueToLabelDict.csv')
+        const records = parse(fileContent)
+        return records.reduce((acc, cur) => {
+            acc[cur[0]] = cur[1]
+            return acc
+        }, {})
+    },
     readDataCSV(inputCSV) {
         const fileContent = fs.readFileSync(inputCSV);
         const records = parse(fileContent, {columns: true});

@@ -22,7 +22,7 @@ module.exports = {
             return []
         }
         let keys = Object.keys(obj)
-        return keys.filter(elm => elm.startsWith(param))
+        return keys.filter(elm => elm.includes(param))
     },
 
     filterKeyVals(keys, obj) {
@@ -55,6 +55,22 @@ module.exports = {
                                  tot += isNaN(parseInt(e)) ? 0 : parseInt(e)
                                  return tot
                             }, 0) / Object.values(metrics[cur]).length
+            return acc
+        }, {})
+    },
+    renameKeys(object, newKeys) {
+        return Object.keys(object).reduce((acc, cur) => {
+            acc[newKeys[cur]] = object[cur]
+            return acc
+        }, {})
+    },
+    getCountsMetrics(registries, data) {
+        if (typeof data !== "object" || Object.keys(data).length === 0 ) {
+            return {}
+        }
+        let completeKeys = this.getKeys('total', data[registries[0]])
+        return registries.reduce((acc, cur) => {
+            acc[cur] = this.filterKeyVals(completeKeys, data[cur])
             return acc
         }, {})
     }
