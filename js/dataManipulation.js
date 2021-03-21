@@ -5,14 +5,14 @@ module.exports = {
         "unique": (reg, data) => {
             let metrics = objUtils.getMetricValues("unique", reg, data)
             return Object.keys(metrics).reduce((acc, cur) => {
-                acc[cur] = 100 - parseInt(metrics[cur]['unique_ids_perc'])
+                acc[cur] = (100 - parseInt(metrics[cur]['unique_ids_perc'])).toFixed(2)
                 return acc
             }, {})
         },
         "complete": (reg, data) => {
             let metrics = objUtils.getMetricValues("complete", reg, data)
             return Object.keys(metrics).reduce((acc, cur) => {
-                acc[cur] = parseInt(metrics[cur]['complete_all'])
+                acc[cur] = parseInt(metrics[cur]['complete_all']).toFixed(2)
                 return acc
             }, {})
         },

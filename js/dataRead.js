@@ -21,7 +21,7 @@ module.exports = {
         const data = records.reduce((acc, cur) => {
             let keys = Object.keys(cur)
             for (let i = 1; i < keys.length; i++) {
-                acc[keys[i]][cur[keys[0]]] = cur[keys[i]]
+                acc[keys[i]][cur[keys[0]]] = Number(cur[keys[i]]).toFixed(2)
             }
             return acc
         }, init)
@@ -51,7 +51,7 @@ module.exports = {
             return {
                 name: r,
                 data: Object.keys(ret).reduce((acc, elm) => {
-                    acc[elm] = ret[elm][r]
+                    acc[elm] = parseInt(ret[elm][r]).toFixed(2)
                     return acc
                 }, {})
             }

@@ -49,12 +49,12 @@ module.exports = {
         }
         return Object.keys(metrics).reduce((acc, cur) => {
             //Sums up and associates average with registry
-            acc[cur] = Object.values(metrics[cur])
+            acc[cur] = parseInt(Object.values(metrics[cur])
                             //Sums and divides by number of values
                              .reduce((tot, e) => {
                                  tot += isNaN(parseInt(e)) ? 0 : parseInt(e)
                                  return tot
-                            }, 0) / Object.values(metrics[cur]).length
+                            }, 0) / Object.values(metrics[cur]).length).toFixed(2)
             return acc
         }, {})
     },
