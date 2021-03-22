@@ -17,100 +17,76 @@ app.use(cors())
 
 const port = process.env.PORT || 3000
 
-app.post('/totals/:metric', (req, res) => {
-    let reg = req.body.registries
-    let set = req.body.set
+app.get('/totals/:metric', (req, res) => {
+    let {registries, set} = req.query
     
-    if (set.path === undefined) {
-        set = dataReader.getCSVList()[0]
+    if (set === undefined || set === 'undefined') {
+        set = dataReader.getCSVList()[0].path
     }
-    let data = readDataCSV(__dirname+'\\data\\'+set.path)
+    let data = readDataCSV(__dirname+'\\data\\'+set)
     let metric = req.params.metric
-    if (reg == undefined) {
+    if (registries == undefined) {
         res.sendStatus(402)
+        return
     }
-    if (reg == []) {
+    if (registries == []) {
         res.json({})
+        return
     }
-    res.json(summaryCalcs[metric](reg, data))
+    res.json(summaryCalcs[metric](registries.split(','), data))
 })
 
 app.get('/registries', (_, res) => {
     res.json(Object.keys(testData))
 })
 
-app.post('/counts', (req, res) => {
-    let reg = req.body.registries
-    let set = req.body.set
+app.get('/metrics/:metric', (req,res) => {
+    let {registries, set} = req.query
 
-    if (set === undefined || set.path === undefined) {
+    let data = readDataCSV(__dirname+'\\data\\'+set)
+
+    if (req.params.metric === "consistency") {
+        res.json(
+            objUtils.getMetricValues(
+                'consist',
+                registries.split(','),
+                data)
+        )
+    } else {
+        res.json(
+            objUtils.getMetricValues(
+                req.params.metric,
+                registries.split(','),
+                data)
+        )
+    }
+})
+
+app.get('/counts', (req, res) => {
+    let {registries, set} = req.query
+
+    if (set === undefined || set === 'undefined') {
         set = dataReader.getCSVList()[0]
     }
-    let data = readDataCSV(__dirname+'\\data\\'+set.path)
-    if (reg == undefined) {
+    let data = readDataCSV(__dirname+'\\data\\'+set)
+    if (registries == undefined) {
         res.sendStatus(401)
     }
-    if (reg == []) {
-        res.json({})
-    }
-    res.json(objUtils.getCountsMetrics(reg, data))
+    res.json(objUtils.getCountsMetrics(registries.split(','), data))
 })
 
-app.post('/totals', (req, res) => {
-    let reg = req.body.registries
-    let set = req.body.set
-    let data = readDataCSV(__dirname+'\\data\\'+set.path)
+app.get('/totals', (req, res) => {
+    
+    let {registries, set} = req.query
+    let data = readDataCSV(__dirname+'\\data\\'+set)
 
-    res.json(objUtils.getMetricValues("", reg, data))
-})
-
-app.post('/completeness', (req, res) => {
-    let reg = req.body.registries
-    let set = req.body.set
-    let data = readDataCSV(__dirname+'\\data\\'+set.path)
-
-    res.json(objUtils.getMetricValues("complete", reg, data))
-})
-
-app.post('/uniqueness', (req, res) => {
-    let reg = req.body.registries
-    let set = req.body.set
-    let data = readDataCSV(__dirname+'\\data\\'+set.path)
-
-    res.json(objUtils.getMetricValues("unique", reg, data))
-})
-
-app.post('/consistency', (req, res) => {
-    let reg = req.body.registries
-    let set = req.body.set
-    let data = readDataCSV(__dirname+'\\data\\'+set.path)
-
-    // res.json(objUtils.getMetricValues("consist", reg, data))
-    let metrics = objUtils.getMetricValues("consist", reg, data)
-    res.json(Object.keys(metrics).reduce((acc, cur) => {
-        acc[cur] = objUtils.renameKeys(metrics[cur], KEY_DICT)
-        return acc
-    }, {}))
-})
-
-app.post('/correctness', (req, res) => {
-    let reg = req.body.registries
-    let set = req.body.set
-    let data = readDataCSV(__dirname+'\\data\\'+set.path)
-
-    // let metrics = objUtils.getMetricValues("correct", reg, data)
-    // res.json(Object.keys(metrics).reduce((acc, cur) => {
-    //     acc[cur] = objUtils.renameKeys(metrics[cur], KEY_DICT)
-    //     return acc
-    // }, {}))
-    res.json(objUtils.getMetricValues("correct", reg, data))
-
+    res.json(objUtils.getMetricValues("", registries.split(','), data))
 })
 
 app.post('/uploadCSV', uploader.single('file'), (_, res) => {
     let csvs = dataReader.getCSVList()
     testData = readDataCSV(__dirname+'\\data\\'+csvs[0].path)
-    res.send()
+    res.send(csvs[0].path)
 })
 
 app.get('/csvList', (_, res) => {
@@ -118,10 +94,11 @@ app.get('/csvList', (_, res) => {
     res.json(csvs)
 })
 
-app.post('/timeData', (req, res) => {
-    let reg = req.body.registries
-    let metric = req.body.metric
-    res.json(dataReader.averagesOverTime(reg, metric))
+app.get('/timeData/:metric', (req, res) => {
+    let {registries} = req.query
+    res.json(
+        dataReader.averagesOverTime(registries.split(','), req.params.metric)
+    )
 })
 
 app.get('/getUploadedCSVList', (_, res) => {
