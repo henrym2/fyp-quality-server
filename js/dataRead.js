@@ -39,9 +39,14 @@ module.exports = {
         }).sort((a,b) => new Date(b.date) - new Date(a.date))
         return filesByDate
     },
-    averagesOverTime(registry, metric) {
+    averagesOverTime(registry, metric, start, end) {
         // const metrics = Object.keys(summaryCalcs)
-        const csvsByDate = this.getCSVList()
+        let startDate = new Date(parseInt(start))
+        let endDate = new Date(parseInt(end))
+        const csvsByDate = this.getCSVList().filter(e => {            
+            return e.date >= startDate && e.date <= endDate 
+        })
+        console.log(csvsByDate)
         const ret = csvsByDate.reduce((date, e) => {
             let data = this.readDataCSV(__dirname+'\\..\\data\\'+e.path)
             date[e.date] = summaryCalcs[metric](registry, data)

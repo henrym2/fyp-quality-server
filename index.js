@@ -95,9 +95,9 @@ app.get('/csvList', (_, res) => {
 })
 
 app.get('/timeData/:metric', (req, res) => {
-    let {registries} = req.query
+    let {registries, start, end} = req.query
     res.json(
-        dataReader.averagesOverTime(registries.split(','), req.params.metric)
+        dataReader.averagesOverTime(registries.split(','), req.params.metric, start, end)
     )
 })
 
