@@ -15,8 +15,8 @@ const testObj = {
 
 test("Ensure average is calculated for each nested object", () => {
     expect(objAverage(testObj)).toStrictEqual({
-        Alderaan: 18.333333333333332,
-        DeathStar: 15
+        Alderaan: "18.00",
+        DeathStar: "15.00"
     })
 })
 
@@ -45,7 +45,7 @@ test("Ensure NaN values are handled in object averaging", () => {
         }
     }
     expect(objAverage(NaNObj)).toStrictEqual({
-        "Alderaan": 0,
-        "DeathStar": 10
+        "Alderaan": "0.00",
+        "DeathStar": "10.00"
     })
 })

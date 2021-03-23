@@ -60,7 +60,8 @@ module.exports = {
     },
     renameKeys(object, newKeys) {
         return Object.keys(object).reduce((acc, cur) => {
-            acc[newKeys[cur]] = object[cur]
+            if (newKeys[cur] !== undefined) acc[newKeys[cur]] = object[cur]
+            else acc[cur] = object[cur]
             return acc
         }, {})
     },

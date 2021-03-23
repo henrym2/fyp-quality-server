@@ -17,5 +17,5 @@ test('Get all keys with empty search param', () => {
 })
 
 test('Ensure case sensitivity', () => {
-    expect(getKeys("Test", testObject)).toStrictEqual([])
+    expect(getKeys("Test", testObject)).toStrictEqual(["nonTest1", "nonTest2"])
 })
