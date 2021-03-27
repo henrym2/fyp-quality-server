@@ -1,5 +1,6 @@
 module.exports = {
     /**
+     * @description Retrieve values for a specific metric and list of registries from CSV read data
     * @returns {Array}
     * @param {String} metric 
     * @param {Array} registries 
@@ -16,7 +17,12 @@ module.exports = {
         }, {})
         return results
     },
-
+    /**
+     * @description Retrieve a list of keys from an object based on a given search param/keyword
+     * @param {string} param Search parameter for filting keys
+     * @param {object} obj Object to filter
+     * @returns {Object}
+     */
     getKeys(param, obj) {
         if (typeof obj !== "object" || Object.keys(obj).length === 0) {
             return []
@@ -24,7 +30,12 @@ module.exports = {
         let keys = Object.keys(obj)
         return keys.filter(elm => elm.includes(param))
     },
-
+    /**
+     * @description Filter an objects key value pairs based on a provided list of keys
+     * @param {string[]} keys List of object keys
+     * @param {Object} obj Object to be filtered
+     * @returns {Object} filtered object
+     */
     filterKeyVals(keys, obj) {
         if (typeof obj !== "object" || Object.keys(obj).length === 0) {
             return {}
@@ -58,6 +69,12 @@ module.exports = {
             return acc
         }, {})
     },
+    /**
+     * @description Utility function for replacing the keys for specific values in an object. 
+     * @param {object} object Object with keys to be renamed
+     * @param {Object} newKeys Object containing key value pairs between old and new values for the input object keys
+     * @returns {Object} New object with replaced keys
+     */
     renameKeys(object, newKeys) {
         return Object.keys(object).reduce((acc, cur) => {
             if (newKeys[cur] !== undefined) acc[newKeys[cur]] = object[cur]
@@ -65,6 +82,12 @@ module.exports = {
             return acc
         }, {})
     },
+    /**
+     * @description Retrieves specifically "totals" metrics from a list of registries in a dataset
+     * @param {string[]} registries List of registries
+     * @param {Object} data Data
+     * @returns {Object}
+     */
     getCountsMetrics(registries, data) {
         if (typeof data !== "object" || Object.keys(data).length === 0 ) {
             return {}
