@@ -28,3 +28,16 @@ jobs:
     - run: npm ci
     - run: npm run build --if-present
     - run: npm test
+
+  docs:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [14.x]
+    steps:
+    - name: JSDoc Action
+      uses: andstor/jsdoc-action@v1.2.0
+      with:
+        source_dir: ./js
+        recurse: true
+        output_dir: ./out
