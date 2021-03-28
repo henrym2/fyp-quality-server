@@ -3,7 +3,6 @@ const objUtils = require('./objUtils.js')
 module.exports = {
     /**
      * @description Object containing a list of functions that can be indexed by metric type
-     * @property
      */
     summaryCalcs: {
         /**
