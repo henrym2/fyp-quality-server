@@ -1,5 +1,4 @@
 const { Router } = require("express")
-const objUtils = require("../js/objUtils")
 const dataReader = require("../js/dataRead")
 
 const handler = Router()

@@ -157,8 +157,8 @@ handler.get('/totals/:metric', (req, res) => {
             return
         }
         res.json(
-            Object.keys(metric).reduce((acc, cur) => {
-                acc[cur] = objUtils.renameKeys(metric[cur], KEY_DICT)
+            Object.keys(metricValues).reduce((acc, cur) => {
+                acc[cur] = objUtils.renameKeys(metricValues[cur], KEY_DICT)
                 return acc
             }, {})
         )
