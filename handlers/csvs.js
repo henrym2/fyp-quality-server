@@ -2,7 +2,6 @@ const { Router } = require("express")
 const dataReader = require("../js/dataRead")
 const uploader = require("../js/multer.js")
 
-const KEY_DICT = dataReader.generateReadableLabels()
 
 const handler = Router()
 
@@ -13,7 +12,11 @@ const handler = Router()
  * @function
  * @inner
  */
-handler.post('/', uploader.single('file'), (_, res) => {
+handler.post('/', uploader.single('file'), (req, res) => {
+    if (req.fileValidationError) {
+        res.status(415).send(req.fileValidationError)
+        return
+    }
     let csvs = dataReader.getCSVList()
     res.status(201).send(csvs[0].path)
 })
@@ -27,6 +30,11 @@ handler.post('/', uploader.single('file'), (_, res) => {
  */
 handler.get('/', (_, res) => {
     let csvs = dataReader.getCSVList()
+
+    if (csvs.length === 0) {
+        res.status(203).json([])
+        return
+    }
     res.json(csvs)
 })
 

@@ -23,20 +23,24 @@ module.exports = {
      * @returns {Object} Data
      */
     readDataCSV(inputCSV) {
-        const fileContent = fs.readFileSync(inputCSV);
-        const records = parse(fileContent, {columns: true});
-        let init = {}
-        for (let i = 1; i < Object.keys(records[0]).length; i++) {
-            init[Object.keys(records[0])[i]] = {}
-        }
-        const data = records.reduce((acc, cur) => {
-            let keys = Object.keys(cur)
-            for (let i = 1; i < keys.length; i++) {
-                acc[keys[i]][cur[keys[0]]] = Number(cur[keys[i]]).toFixed(2)
+        try {
+            const fileContent = fs.readFileSync(inputCSV);
+            const records = parse(fileContent, {columns: true});
+            let init = {}
+            for (let i = 1; i < Object.keys(records[0]).length; i++) {
+                init[Object.keys(records[0])[i]] = {}
             }
-            return acc
-        }, init)
-        return data
+            const data = records.reduce((acc, cur) => {
+                let keys = Object.keys(cur)
+                for (let i = 1; i < keys.length; i++) {
+                    acc[keys[i]][cur[keys[0]]] = Number(cur[keys[i]]).toFixed(2)
+                }
+                return acc
+            }, init)
+            return data
+        } catch (err) {
+            return {}
+        }
     },
     /**
      * @description Get a list of all CSVs currently stored
@@ -49,16 +53,20 @@ module.exports = {
      * }
      */
     getCSVList() {
-        let fileList = fs.readdirSync('./data')
-        let filesByDate = fileList.map(e => {
-            let split = e.split('-')
-            return {
-                name: split[1],
-                date: new Date(parseInt(split[0])),
-                path: e
-            }
-        }).sort((a,b) => new Date(b.date) - new Date(a.date))
-        return filesByDate
+        try {
+            let fileList = fs.readdirSync('./data')
+            let filesByDate = fileList.map(e => {
+                let split = e.split('-')
+                return {
+                    name: split[1],
+                    date: new Date(parseInt(split[0])),
+                    path: e
+                }
+            }).sort((a,b) => new Date(b.date) - new Date(a.date))
+            return filesByDate
+        } catch (e) {
+            return []
+        }
     },
     /**
      * @description Retrieve average data for a metric/registry combination over time
@@ -69,25 +77,29 @@ module.exports = {
      * @returns {Object}
      */
     averagesOverTime(registry, metric, start, end) {
-        let startDate = new Date(parseInt(start))
-        let endDate = new Date(parseInt(end))
-        const csvsByDate = this.getCSVList().filter(e => {            
-            return e.date >= startDate && e.date <= endDate 
-        })
-        const ret = csvsByDate.reduce((date, e) => {
-            let data = this.readDataCSV(__dirname+'\\..\\data\\'+e.path)
-            date[e.date] = summaryCalcs[metric](registry, data)
-            return date
-        }, {})
-        const newRet = registry.map(r => {
-            return {
-                name: r,
-                data: Object.keys(ret).reduce((acc, elm) => {
-                    acc[elm] = parseInt(ret[elm][r]).toFixed(2)
-                    return acc
-                }, {})
-            }
-        })
-        return newRet
+        try {
+            let startDate = new Date(parseInt(start))
+            let endDate = new Date(parseInt(end))
+            const csvsByDate = this.getCSVList().filter(e => {            
+                return e.date >= startDate && e.date <= endDate 
+            })
+            const ret = csvsByDate.reduce((date, e) => {
+                let data = this.readDataCSV(__dirname+'\\..\\data\\'+e.path)
+                date[e.date] = summaryCalcs[metric](registry, data)
+                return date
+            }, {})
+            const newRet = registry.map(r => {
+                return {
+                    name: r,
+                    data: Object.keys(ret).reduce((acc, elm) => {
+                        acc[elm] = parseInt(ret[elm][r]).toFixed(2)
+                        return acc
+                    }, {})
+                }
+            })
+            return newRet
+        } catch (e) {
+            return []
+        }
     }
 }

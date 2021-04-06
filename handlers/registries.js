@@ -19,9 +19,17 @@ handler.get('/', (req, res) => {
     if (set === undefined || set === "undefined") {
         csvs = dataReader.getCSVList()
     }
-    res.json(Object.keys(
+
+    let registries = Object.keys(
         dataReader.readDataCSV(__dirname+'\\..\\data\\'+csvs[0].path)
-    ))
+    )
+
+    if (registries.length === 0 || csvs.length === 0) {
+        res.status(203).json({})
+        return
+    }
+    
+    res.json(registries)
 })
 
 module.exports = handler

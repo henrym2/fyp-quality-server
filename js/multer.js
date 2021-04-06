@@ -11,9 +11,11 @@ const storage = multer.diskStorage(
 );
 
 function filter(req, file, cb) {
+    console.log(file)
     if (file.mimetype !== 'text/csv') {
-        req.fileValidationError = 'goes wrong on the mimetype';
-        return cb(null, false, new Error('goes wrong on the mimetype'));
+        req.fileValidationError = 'Non CSV file cannot be uploaded';
+        cb(null, false, new Error('Non CSV file cannot be uploaded'));
+        return
     }
     cb(null, true);
     }

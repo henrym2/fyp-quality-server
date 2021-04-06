@@ -38,13 +38,17 @@ handler.get('/timeData/:metric', (req, res) => {
     }
 
     if (registries == []) {
-        res.sendStatus(204)
+        res.status(204).json([])
         return
     }
 
-    res.json(
-        dataReader.averagesOverTime(registries.split(','), req.params.metric, start, end)
-    )
+    let metricData = dataReader.averagesOverTime(registries.split(','), req.params.metric, start, end)
+    
+    if (metricData.length === 0) {
+        res.status(204).json([])
+        return
+    }
+    res.json(metricData)
 })
 
 /**
@@ -74,7 +78,14 @@ handler.get('/totals/:metric', (req, res) => {
         res.status(204).json({})
         return
     }
-    res.json(summaryCalcs[metric](registries.split(','), data))
+
+    let summaryData = summaryCalcs[metric](registries.split(','), data)
+
+    if (Object.keys(summaryData).length === 0) {
+        res.status(204).json({})
+        return
+    }
+    res.json(summaryData)
 })
 
 /**
@@ -95,10 +106,23 @@ handler.get('/totals/:metric', (req, res) => {
     let data = dataReader.readDataCSV(__dirname+'\\..\\data\\'+set)
 
     if (registries == undefined) {
-        res.sendStatus(401)
+        res.sendStatus(400)
+        return
     }
-    
-    res.json(objUtils.getCountsMetrics(registries.split(','), data))
+
+    if (registries.length === 0) {
+        res.status(203).json({})
+        return
+    }
+
+    let countMetrics = objUtils.getCountsMetrics(registries.split(','), data)
+
+    if (Object.keys(countMetrics).length === 0) {
+        res.status(203).json({})
+        return
+    }
+
+    res.json(countMetrics)
 })
 
 /**
@@ -114,11 +138,24 @@ handler.get('/totals/:metric', (req, res) => {
 
     let data = dataReader.readDataCSV(__dirname+'\\..\\data\\'+set)
 
+    if (registries == undefined) {
+        res.sendStatus(400)
+        return
+    }
+
+    if (registries.length === 0) {
+        res.status(203).json({})
+        return
+    }
+
+    let metricValues
+
     if (req.params.metric === "consistency") {
-        let metric = objUtils.getMetricValues(
-            'consist',
-            registries.split(','),
-            data)
+        metricValues = objUtils.getMetricValues('consist', registries.split(','), data)
+        if (Object.keys(metricValues) === 0) {
+            res.status(203).json({})
+            return
+        }
         res.json(
             Object.keys(metric).reduce((acc, cur) => {
                 acc[cur] = objUtils.renameKeys(metric[cur], KEY_DICT)
@@ -126,12 +163,12 @@ handler.get('/totals/:metric', (req, res) => {
             }, {})
         )
     } else {
-        res.json(
-            objUtils.getMetricValues(
-                req.params.metric,
-                registries.split(','),
-                data)
-        )
+        metricValues = objUtils.getMetricValues(req.params.metric, registries.split(','), data)
+        if (Object.keys(metricValues) === 0) {
+            res.status(203).json({})
+            return
+        }
+        res.json(metricValues)
     }
 })
 
