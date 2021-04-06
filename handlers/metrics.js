@@ -44,7 +44,7 @@ handler.get('/timeData/:metric', (req, res) => {
 
     let metricData = dataReader.averagesOverTime(registries.split(','), req.params.metric, start, end)
     
-    if (metricData.length === 0) {
+    if (metricData.length === 0 || metricData.every(e => Object.keys(e.data).length === 0)) {
         res.status(204).json([])
         return
     }
@@ -111,14 +111,14 @@ handler.get('/totals/:metric', (req, res) => {
     }
 
     if (registries.length === 0) {
-        res.status(203).json({})
+        res.status(204).json({})
         return
     }
 
     let countMetrics = objUtils.getCountsMetrics(registries.split(','), data)
 
     if (Object.keys(countMetrics).length === 0) {
-        res.status(203).json({})
+        res.status(204).json({})
         return
     }
 

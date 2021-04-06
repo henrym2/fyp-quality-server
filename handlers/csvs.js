@@ -32,7 +32,7 @@ handler.get('/', (_, res) => {
     let csvs = dataReader.getCSVList()
 
     if (csvs.length === 0) {
-        res.status(203).json([])
+        res.status(204).json([])
         return
     }
     res.json(csvs)

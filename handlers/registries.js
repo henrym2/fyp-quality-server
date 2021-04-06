@@ -24,7 +24,7 @@ handler.get('/', (req, res) => {
     )
 
     if (registries.length === 0 || csvs.length === 0) {
-        res.status(203).json({})
+        res.status(204).json({})
         return
     }
     
