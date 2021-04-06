@@ -7,25 +7,13 @@ const KEY_DICT = dataReader.generateReadableLabels()
 const handler = Router()
 
 /**
- * @description Upon a successful get request, returns the counts metrics for the queried set and registries
- * @param registries
- * @param set
- * @name GET:/counts
- * @function
- * @inner
+ * Utility function for checking if a date is valid
+ * @param {date} d Date to check if valid
+ * @returns {boolean}
  */
-handler.get('/counts', (req, res) => {
-    let {registries, set} = req.query
-
-    if (set === undefined || set === 'undefined') {
-        set = dataReader.getCSVList()[0]
-    }
-    let data = dataReader.readDataCSV(__dirname+'\\..\\data\\'+set)
-    if (registries == undefined) {
-        res.sendStatus(401)
-    }
-    res.json(objUtils.getCountsMetrics(registries.split(','), data))
-})
+function isValidDate(d) {
+    return d instanceof Date && !isNaN(d);
+}
 
 /**
  * @description Upon a successful GET request, return a average over time data for a given metric on queried registries over a range
@@ -38,6 +26,22 @@ handler.get('/counts', (req, res) => {
  */
 handler.get('/timeData/:metric', (req, res) => {
     let {registries, start, end} = req.query
+
+    if (registries === undefined || start === undefined || end === undefined) {
+        res.sendStatus(400)
+        return
+    }
+
+    if (!isValidDate(new Date(parseInt(start))) || !isValidDate(new Date(parseInt(end)))) {
+        res.sendStatus(400)
+        return
+    }
+
+    if (registries == []) {
+        res.sendStatus(204)
+        return
+    }
+
     res.json(
         dataReader.averagesOverTime(registries.split(','), req.params.metric, start, end)
     )
@@ -57,20 +61,45 @@ handler.get('/totals/:metric', (req, res) => {
     if (set === undefined || set === 'undefined') {
         set = dataReader.getCSVList()[0].path
     }
+    
     let data = dataReader.readDataCSV(__dirname+'\\..\\data\\'+set)
     let metric = req.params.metric
+
     if (registries == undefined) {
-        res.sendStatus(402)
+        res.sendStatus(400)
         return
     }
+
     if (registries == []) {
-        res.json({})
+        res.status(204).json({})
         return
     }
     res.json(summaryCalcs[metric](registries.split(','), data))
 })
 
+/**
+ * @description Upon a successful get request, returns the counts metrics for the queried set and registries
+ * @param registries
+ * @param set
+ * @name GET:/counts
+ * @function
+ * @inner
+ */
+ handler.get('/counts', (req, res) => {
+    let {registries, set} = req.query
 
+    if (set === undefined || set === 'undefined') {
+        set = dataReader.getCSVList()[0]
+    }
+
+    let data = dataReader.readDataCSV(__dirname+'\\..\\data\\'+set)
+
+    if (registries == undefined) {
+        res.sendStatus(401)
+    }
+    
+    res.json(objUtils.getCountsMetrics(registries.split(','), data))
+})
 
 /**
  * @description Upon a successful get request, returns the metric values for the queried set and registries

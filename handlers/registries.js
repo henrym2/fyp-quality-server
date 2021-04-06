@@ -4,18 +4,6 @@ const dataReader = require("../js/dataRead")
 
 const handler = Router()
 
-/**
- * @description Upon a successful GET request, provides all metric values for a specific set
- * @name GET:/totals
- * @function
- * @inner
- */
-handler.get('/totals', (req, res) => {
-    let {registries, set} = req.query
-    let data = dataReader.readDataCSV(__dirname+'\\data\\'+set)
-
-    res.json(objUtils.getMetricValues("", registries.split(','), data))
-})
 
 /**
  * @description Upon a successful GET request, provides a list of all registries in the most recent data set
@@ -23,8 +11,14 @@ handler.get('/totals', (req, res) => {
  * @function
  * @inner
  */
-handler.get('/', (_, res) => {
-    const csvs = dataReader.getCSVList()
+handler.get('/', (req, res) => {
+    const { set } = req.query
+
+    let csvs = []
+
+    if (set === undefined || set === "undefined") {
+        csvs = dataReader.getCSVList()
+    }
     res.json(Object.keys(
         dataReader.readDataCSV(__dirname+'\\..\\data\\'+csvs[0].path)
     ))
